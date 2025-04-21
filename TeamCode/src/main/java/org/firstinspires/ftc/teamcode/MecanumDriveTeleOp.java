@@ -32,8 +32,6 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name="Mecanum Drive", group="TeleOp")
@@ -46,12 +44,6 @@ public class MecanumDriveTeleOp extends LinearOpMode {
     private DcMotor backLeftDrive = null;
     private DcMotor backRightDrive = null;
     
-    // Slide motor with encoder
-    private DcMotorEx verticalSlide = null;
-    
-    // Constants for slide positions
-    private static final int SLIDE_TARGET_POSITION = 2000;
-    private static final int SLIDE_HOME_POSITION = 0;
 
     @Override
     public void runOpMode() {
@@ -61,7 +53,6 @@ public class MecanumDriveTeleOp extends LinearOpMode {
         frontRightDrive = hardwareMap.get(DcMotor.class, "front_right");
         backLeftDrive  = hardwareMap.get(DcMotor.class, "back_left");
         backRightDrive = hardwareMap.get(DcMotor.class, "back_right");
-        verticalSlide = hardwareMap.get(DcMotorEx.class, "vertical_slide");
 
         // Most robots need the motors on one side to be reversed to drive forward.
         // When you first test your robot, push the left joystick forward 
@@ -71,12 +62,6 @@ public class MecanumDriveTeleOp extends LinearOpMode {
         backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
         frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
         backRightDrive.setDirection(DcMotor.Direction.FORWARD);
-        
-        // Configure vertical slide motor for position control
-        verticalSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        verticalSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        verticalSlide.setDirection(DcMotorSimple.Direction.FORWARD); // Adjust if needed
-        verticalSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Wait for the game to start (driver presses PLAY)
         telemetry.addData("Status", "Initialized");
@@ -118,41 +103,11 @@ public class MecanumDriveTeleOp extends LinearOpMode {
             backLeftDrive.setPower(backLeftPower);
             backRightDrive.setPower(backRightPower);
 
-            // Handle the vertical slide motor
-            if (gamepad2.y) {
-                // Move to target position when Y is pressed
-                verticalSlide.setTargetPosition(SLIDE_TARGET_POSITION);
-                verticalSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                verticalSlide.setPower(0.7); // Power level for moving to position
-                telemetry.addData("Slide", "Moving to position: %d", SLIDE_TARGET_POSITION);
-            } else if (gamepad2.a) {
-                // Return to home position when A is pressed
-                verticalSlide.setTargetPosition(SLIDE_HOME_POSITION);
-                verticalSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                verticalSlide.setPower(0.7); // Power level for moving to position
-                telemetry.addData("Slide", "Moving to home position");
-            }
-            
-            // Manual slide control using the right stick on gamepad2 when not in position mode
-            if (verticalSlide.getMode() != DcMotor.RunMode.RUN_TO_POSITION) {
-                double slideControl = -gamepad2.right_stick_y;
-                verticalSlide.setPower(slideControl * 0.7);
-            }
-            
-            // If slide is done moving to position, switch back to encoder mode
-            if (verticalSlide.getMode() == DcMotor.RunMode.RUN_TO_POSITION && 
-                !verticalSlide.isBusy()) {
-                verticalSlide.setPower(0);
-                verticalSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            }
 
             // Show the elapsed game time and motor information
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front Motors", "left: %.2f, right: %.2f", frontLeftPower, frontRightPower);
             telemetry.addData("Back Motors", "left: %.2f, right: %.2f", backLeftPower, backRightPower);
-            telemetry.addData("Vertical Slide", "Position: %d, Target: %d", 
-                              verticalSlide.getCurrentPosition(), 
-                              verticalSlide.getTargetPosition());
             telemetry.update();
         }
     }
