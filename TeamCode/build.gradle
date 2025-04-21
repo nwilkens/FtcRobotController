@@ -25,6 +25,4 @@ android {
 
 dependencies {
     implementation project(':FtcRobotController')
-    implementation 'com.github.NoahBres:PedroPaths:0.0.4'
-    implementation 'com.acmerobotics.roadrunner:core:0.5.6'
 }
