@@ -49,10 +49,10 @@ public class MecanumDriveTeleOp extends LinearOpMode {
     public void runOpMode() {
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration step on the DS or RC devices.
-        frontLeftDrive  = hardwareMap.get(DcMotor.class, "front_left");
-        frontRightDrive = hardwareMap.get(DcMotor.class, "front_right");
-        backLeftDrive  = hardwareMap.get(DcMotor.class, "back_left");
-        backRightDrive = hardwareMap.get(DcMotor.class, "back_right");
+        frontLeftDrive  = hardwareMap.get(DcMotor.class, "FLdrive");
+        frontRightDrive = hardwareMap.get(DcMotor.class, "FRdrive");
+        backLeftDrive  = hardwareMap.get(DcMotor.class, "BLdrive");
+        backRightDrive = hardwareMap.get(DcMotor.class, "BRdrive");
 
         // Most robots need the motors on one side to be reversed to drive forward.
         // When you first test your robot, push the left joystick forward 
