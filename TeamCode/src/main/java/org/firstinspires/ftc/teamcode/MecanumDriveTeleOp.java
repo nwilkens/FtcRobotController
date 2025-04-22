@@ -84,12 +84,15 @@ public class MecanumDriveTeleOp extends LinearOpMode {
             double drive = -gamepad1.left_stick_y;  // Forward/backward
             double strafe = gamepad1.left_stick_x;  // Left/right
             double turn = gamepad1.right_stick_x;   // Rotation
+            
+            // Apply speed scaling if left bumper is pressed
+            double speedMultiplier = gamepad1.left_bumper ? 0.5 : 1.0;
 
             // Calculate motor powers using mecanum drive kinematics
-            double frontLeftPower = drive + strafe + turn;
-            double frontRightPower = drive - strafe - turn;
-            double backLeftPower = drive - strafe + turn;
-            double backRightPower = drive + strafe - turn;
+            double frontLeftPower = (drive + strafe + turn) * speedMultiplier;
+            double frontRightPower = (drive - strafe - turn) * speedMultiplier;
+            double backLeftPower = (drive - strafe + turn) * speedMultiplier;
+            double backRightPower = (drive + strafe - turn) * speedMultiplier;
 
             // Normalize the values so no wheel power exceeds 100%
             max = Math.max(Math.abs(frontLeftPower), Math.abs(frontRightPower));
@@ -112,6 +115,7 @@ public class MecanumDriveTeleOp extends LinearOpMode {
 
             // Show the elapsed game time and motor information
             telemetry.addData("Status", "Run Time: " + runtime.toString());
+            telemetry.addData("Speed Mode", gamepad1.left_bumper ? "50%" : "100%");
             telemetry.addData("Front Motors", "left: %.2f, right: %.2f", frontLeftPower, frontRightPower);
             telemetry.addData("Back Motors", "left: %.2f, right: %.2f", backLeftPower, backRightPower);
             telemetry.update();
