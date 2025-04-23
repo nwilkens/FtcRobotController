@@ -33,16 +33,21 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-@TeleOp(name="Mecanum Drive", group="TeleOp")
+@TeleOp(name="Mecanum Drive2", group="TeleOp")
 public class MecanumDriveTeleOp extends LinearOpMode {
 
-    // Declare OpMode members for motors.
+    // Declare OpMode members for motors and sensors.
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor frontLeftDrive = null;
     private DcMotor frontRightDrive = null;
     private DcMotor backLeftDrive = null;
     private DcMotor backRightDrive = null;
+    private SparkFunOTOS odometrySensor = null;
     
 
     @Override
@@ -69,6 +74,19 @@ public class MecanumDriveTeleOp extends LinearOpMode {
         backLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        // Initialize OTOS sensor (make sure this matches your configuration name)
+        try {
+            odometrySensor = hardwareMap.get(SparkFunOTOS.class, "sensor_otos");
+            configureOtosSensor();
+            telemetry.addData("OTOS Sensor", "Initialized");
+        } catch (Exception e) {
+            telemetry.addData("OTOS Sensor", "Not found! Error: %s", e.getMessage());
+            odometrySensor = null;
+        }
+
+        // Setup dashboard telemetry
+        telemetry = DashboardInitialization.createTelemetry(telemetry);
+        
         // Wait for the game to start (driver presses PLAY)
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -118,7 +136,59 @@ public class MecanumDriveTeleOp extends LinearOpMode {
             telemetry.addData("Speed Mode", gamepad1.left_bumper ? "50%" : "100%");
             telemetry.addData("Front Motors", "left: %.2f, right: %.2f", frontLeftPower, frontRightPower);
             telemetry.addData("Back Motors", "left: %.2f, right: %.2f", backLeftPower, backRightPower);
+            
+            // Add OTOS position data to telemetry
+            if (odometrySensor != null) {
+                // Check for reset request
+                if (gamepad1.triangle) {
+                    odometrySensor.resetTracking();
+                    telemetry.addData("OTOS", "Position Reset!");
+                }
+                
+                // Check for IMU calibration request
+                if (gamepad1.square) {
+                    odometrySensor.calibrateImu();
+                    telemetry.addData("OTOS", "IMU Calibrated!");
+                }
+                
+                // Get and display position data
+                SparkFunOTOS.Pose2D position = odometrySensor.getPosition();
+                telemetry.addData("Position", "X: %.2f, Y: %.2f", position.x, position.y);
+                telemetry.addData("Heading", "%.2f", position.h);
+                telemetry.addLine("Press TRIA to reset position tracking");
+                telemetry.addLine("Press SQUA to calibrate IMU");
+            }
+            
             telemetry.update();
         }
+    }
+    
+    /**
+     * Configure the OTOS sensor with initial settings
+     */
+    private void configureOtosSensor() {
+        // Set measurement units (inches and degrees)
+        odometrySensor.setLinearUnit(DistanceUnit.INCH);
+        odometrySensor.setAngularUnit(AngleUnit.DEGREES);
+        
+        // Set sensor offset relative to robot center if needed
+        // This depends on where you mount the sensor on your robot
+        // Example: If mounted 3 inches left and 2 inches forward of center
+        // SparkFunOTOS.Pose2D offset = new SparkFunOTOS.Pose2D(-3, 2, 0);
+        // odometrySensor.setOffset(offset);
+        
+        // Use a default offset of 0,0,0 for now (adjust based on your mounting)
+        SparkFunOTOS.Pose2D offset = new SparkFunOTOS.Pose2D(0, 0, 0);
+        odometrySensor.setOffset(offset);
+        
+        // Set scaling factors (default 1.0, adjust after calibration)
+        odometrySensor.setLinearScalar(1.0);
+        odometrySensor.setAngularScalar(1.0);
+        
+        // Calibrate the IMU
+        odometrySensor.calibrateImu();
+        
+        // Reset tracking
+        odometrySensor.resetTracking();
     }
 }
