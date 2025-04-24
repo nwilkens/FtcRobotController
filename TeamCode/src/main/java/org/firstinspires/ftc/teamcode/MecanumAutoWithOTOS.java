@@ -93,7 +93,7 @@ public class MecanumAutoWithOTOS extends LinearOpMode {
         
         // Wait for the game to start (driver presses PLAY)
         telemetry.addData("Status", "Initialized");
-        telemetry.addData("Path", "Ready to run Pedro Pathing: 12 inches forward and back");
+        telemetry.addData("Path", "Ready to run Pedro Pathing: left 6 ft and forward 2 ft along a curved line");
         telemetry.update();
 
         waitForStart();
@@ -118,20 +118,8 @@ public class MecanumAutoWithOTOS extends LinearOpMode {
                           startPosition.x, startPosition.y, startPosition.h);
         telemetry.update();
 
-        // Pedro Pathing: Move forward 12 inches
-        driveToPosition(startPosition.x, startPosition.y + 12.0, startPosition.h, 5.0);
-        
-        // Small delay
-        sleep(500);
-        
-        // Get current position after first movement
-        SparkFunOTOS.Pose2D midPosition = odometrySensor.getPosition();
-        telemetry.addData("Mid Position", "X: %.2f, Y: %.2f, H: %.2f", 
-                         midPosition.x, midPosition.y, midPosition.h);
-        telemetry.update();
-        
-        // Pedro Pathing: Move back to start position
-        driveToPosition(startPosition.x, startPosition.y, startPosition.h, 5.0);
+        // Pedro Pathing: Move left 6 feet and forward 2 feet along a curved path
+        driveToPosition(startPosition.x - 72.0, startPosition.y + 24.0, startPosition.h + 90.0, 10.0);
 
         // Final position report
         SparkFunOTOS.Pose2D endPosition = odometrySensor.getPosition();

@@ -22,10 +22,10 @@ public class DashboardSample extends LinearOpMode {
         Telemetry dashboardTelemetry = DashboardInitialization.createTelemetry(telemetry);
         
         // Initialize motors
-        leftFrontDrive = hardwareMap.get(DcMotor.class, "leftFrontDrive");
-        rightFrontDrive = hardwareMap.get(DcMotor.class, "rightFrontDrive");
-        leftBackDrive = hardwareMap.get(DcMotor.class, "leftBackDrive");
-        rightBackDrive = hardwareMap.get(DcMotor.class, "rightBackDrive");
+        leftFrontDrive = hardwareMap.get(DcMotor.class, "FLdrive");
+        rightFrontDrive = hardwareMap.get(DcMotor.class, "FRdrive");
+        leftBackDrive = hardwareMap.get(DcMotor.class, "BLdrive");
+        rightBackDrive = hardwareMap.get(DcMotor.class, "BRdrive");
         
         // Set motor directions
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
